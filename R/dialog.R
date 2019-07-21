@@ -19,18 +19,12 @@ getSessionId <- function(x){
   #定义一个指针
   i <- 1;
   while( i < ncount){
-    if( x[i+1] == FALSE){
-      if ( x[i] == FALSE){
-        res[i+1] <- res[i]
-      }else{
-        res[i+1] <- res[i]
-      }
+    # 只有TF这样的模式需要加1
+    #否则维持原有的值
+    if (x[i] == TRUE & x[i+1] == FALSE){
+       res[i+1] <- res[i] +1 ;
     }else{
-      if(x[i] == TRUE){
-        res[i+1] <- res[i]
-      }else{
-        res[i+1] <- res[i] +1 ;
-      }
+      res[i+1] <- res[i];
     }
     i <- i+1;
   }
