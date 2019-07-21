@@ -48,6 +48,7 @@ res$dlg_hms <-right(res$dlg_datetime,8);
 res$gp_id <-res$aut_id;
 res$gp_id[res$isA ==TRUE] <- "";
 res$gp_id <- str_copyPrevRow(res$gp_id);
+res$session_id <- getSessionId(res$isA);
 View(res);
 
 

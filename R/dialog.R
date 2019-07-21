@@ -34,5 +34,6 @@ getSessionId <- function(x){
     }
     i <- i+1;
   }
+  return(res);
 
 }
