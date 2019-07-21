@@ -31,3 +31,24 @@ getSessionId <- function(x){
   return(res);
 
 }
+
+#' 根据Id合并数据处理
+#'
+#' @param data  单项数据
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' log_conbine_gp();
+log_combine_gp <-function(data){
+  dlg_date <- unique(data$dlg_date);
+  gp_id <- unique(data$gp_id);
+  session_id <- unique(data$session_id);
+  isA <- unique(data$isA);
+  action_id <- unique(data$action_id);
+  logContent <- paste(data$logContent,collapse = ";");
+  res <- data.frame(dlg_date,gp_id,session_id,isA,action_id,logContent,stringsAsFactors = F);
+  return(res);
+
+}

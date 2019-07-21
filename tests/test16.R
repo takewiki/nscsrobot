@@ -1,6 +1,7 @@
 library(nrcsrobot);
 library(tsdo);
 library(tsda);
+library(dplyr);
 
 data <-read_kflog(file = 'data-raw/input/2019-07-16.txt');
 log <- data$FkfLog;
@@ -13,10 +14,10 @@ log[1:10];
 log_split <-splitStr(log,"\\):");
 list_count <- length(log_split);
 authorTime <- character(list_count);
-logCotent <- character(list_count);
+logContent <- character(list_count);
 for (i in 1:list_count){
   authorTime[i] <- log_split[[i]][1];
-  logCotent[i] <- log_split[[i]][2];
+  logContent[i] <- log_split[[i]][2];
 }
 #分离作者与datetime信息
 #authorTime;
@@ -29,18 +30,18 @@ for (j in 1:aut_count){
   dlg_datetime[j] <- author_split[[j]][2];
 }
 
-res <- data.frame(aut_id,dlg_datetime,logCotent,stringsAsFactors = F);
+res <- data.frame(aut_id,dlg_datetime,logContent,stringsAsFactors = F);
 #View(res);
 #处理异常数据，删除日期为NA为的记录
 res <- res[!is.na(res$dlg_datetime),];
 #删除所有聊天记录为亲的记录
-res <- res[res$logCotent != '亲',];
-res <- res[res$logCotent != "  亲",];
+res <- res[res$logContent != '亲',];
+res <- res[res$logContent != "  亲",];
 #删除ID异常记录,
 #目前发现地址信息混合到ID中
 res <- res[len(res$aut_id) <=30,]
 #删除所有聊天记录为"'的记录
-res <- res[res$logCotent != "  ",];
+res <- res[res$logContent != "  ",];
 res$isA <- str_contain(res$aut_id,'捷豹路虎')
 res$dlg_date <- left(res$dlg_datetime,10);
 res$dlg_hms <-right(res$dlg_datetime,8);
@@ -49,6 +50,16 @@ res$gp_id <-res$aut_id;
 res$gp_id[res$isA ==TRUE] <- "";
 res$gp_id <- str_copyPrevRow(res$gp_id);
 res$session_id <- getSessionId(res$isA);
-View(res);
+#按列筛选数据
+res <- res %>% df_selectCol(c('dlg_date','gp_id','session_id','isA','logContent'))
+res$action_id <- res$session_id *2;
+res$action_id[res$isA == FALSE] <- res$action_id[res$isA == FALSE] -1;
+
+# 数据进行分组处理
+g <-res$action_id;
+res <- split(res,g);
+
+class(res[[1]]);
+res[[2]];
 
 
