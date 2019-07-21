@@ -2,6 +2,10 @@
 
 export(getSessionId)
 export(log_combine_gp)
+export(log_delBash)
+export(log_delNA)
+export(log_delRow_contains)
+export(log_delRow_equals)
 export(read_kflog)
 import(readr)
 import(tsdo)
