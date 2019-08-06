@@ -35,20 +35,96 @@ getSessionId <- function(x){
 #' 根据Id合并数据处理
 #'
 #' @param data  单项数据
+#' @param sep 多行分隔符
 #'
 #' @return 返回值
 #' @export
 #'
 #' @examples
 #' log_conbine_gp();
-log_combine_gp <-function(data){
+log_combine_gp <-function(data,sep=""){
   dlg_date <- unique(data$dlg_date);
   gp_id <- unique(data$gp_id);
   session_id <- unique(data$session_id);
   isA <- unique(data$isA);
   action_id <- unique(data$action_id);
-  logContent <- paste(data$logContent,collapse = ";");
+  logContent <- paste(data$logContent,collapse = sep);
   res <- data.frame(dlg_date,gp_id,session_id,isA,action_id,logContent,stringsAsFactors = F);
   return(res);
 
+}
+
+#' 在记录结果中按问题删除精确匹配数据
+#'
+#' @param data 数据
+#' @param question_filter_equal 问题精确匹配
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' question_delRow_equal();
+ question_delRow_equal<- function(data,question_filter_equal="?") {
+   x <-data$question;
+   con <- !str_equals(x,question_filter_equal);
+   res <- data[con,];
+   #res <- log_delAutId(res);
+   return(res);
+
+ }
+
+#' 针对问题清单进行模糊匹配
+#'
+#' @param data 数据
+#' @param question_filter_like 过滤器
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' question_delRow_contains();
+question_delRow_contains <- function(data,question_filter_like) {
+   x <-data$question;
+   con <- !str_contains(x,question_filter_like);
+   res <- data[con,];
+
+   return(res);
+}
+
+
+#' 在记录结果中按答案删除精确匹配数据
+#'
+#' @param data 数据
+#' @param answer_filter_equal 问题精确匹配
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' answer_delRow_equal();
+answer_delRow_equal<- function(data,answer_filter_equal="?") {
+  x <-data$answer;
+  con <- !str_equals(x,answer_filter_equal);
+  res <- data[con,];
+  #res <- log_delAutId(res);
+  return(res);
+
+}
+
+#' 针对问题清单进行模糊匹配
+#'
+#' @param data 数据
+#' @param answer_filter_like 过滤器
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' question_delRow_contains();
+answer_delRow_contains <- function(data,answer_filter_like) {
+  x <-data$answer;
+  con <- !str_contains(x,answer_filter_like);
+  res <- data[con,];
+
+  return(res);
 }

@@ -4,10 +4,15 @@
 \alias{dealLog}
 \title{读取日志文件并进行处理，主函数}
 \usage{
-dealLog(file = "data-raw/input/2019-07-17.txt")
+dealLog(file = "data-raw/input/2019-07-17.txt", filter_equal,
+  filter_like)
 }
 \arguments{
 \item{file}{日志文件}
+
+\item{filter_equal}{传入精确匹配}
+
+\item{filter_like}{传入模糊匹配}
 }
 \value{
 返回数据框

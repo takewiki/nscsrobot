@@ -4,10 +4,12 @@
 \alias{log_combine_gp}
 \title{根据Id合并数据处理}
 \usage{
-log_combine_gp(data)
+log_combine_gp(data, sep = "")
 }
 \arguments{
 \item{data}{单项数据}
+
+\item{sep}{多行分隔符}
 }
 \value{
 返回值

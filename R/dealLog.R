@@ -1,5 +1,7 @@
 #' 读取日志文件并进行处理，主函数
 #'
+#' @param filter_equal 传入精确匹配
+#' @param filter_like  传入模糊匹配
 #' @param file 日志文件
 #'
 #' @return 返回数据框
@@ -8,7 +10,8 @@
 #'
 #' @examples
 #' dealLog();
-dealLog <- function(file='data-raw/input/2019-07-17.txt') {
+dealLog <- function(file='data-raw/input/2019-07-17.txt',
+                    filter_equal,filter_like) {
   data <-read_kflog(file = file);
   log <- data$FkfLog;
   #' 针对数据进行删除处理，不包括------
@@ -27,16 +30,22 @@ dealLog <- function(file='data-raw/input/2019-07-17.txt') {
   #View(res);
   #处理异常数据，删除日期为NA为的记录
   res <- res %>% log_delNA();
+  #删除所有aut_id为空的记录
+  res <- res[!is.na(res$aut_id),];
   #删除所有聊天记录中完全匹配的字段
   #如果是模糊匹配，请使用log_delRow_contains();
-  keys_equal <-c('亲',"  亲","  好的","  ","[卡片]","  [卡片]", "  [语音]"
-  );
+  #keys_equal <-c('亲',"  亲","  好的","  ","[卡片]","  [卡片]", "  [语音]"  );
+  keys_equal <-filter_equal;
 
   res <-res %>% log_delRow_equals(keys_equal);
+  #删除NA异常数据
+  res <- res[!is.na(res$aut_id),];
 
   #删除模糊匹配的记录
-  keys_contains <-c('https://','http')
+  #keys_contains <-c('https://','http')
+  keys_contains <- filter_like
   res <- res %>% log_delRow_contains(keys_contains);
+  res <- res[!is.na(res$aut_id),];
   #
   # View(res);
 
@@ -79,3 +88,76 @@ dealLog <- function(file='data-raw/input/2019-07-17.txt') {
   names(res) <-c("dlg_date","gp_id","session_id","question","answer")
   return(res);
 }
+
+
+
+#' 用于数据处理
+#'
+#' @param file 日志名
+#' @param file_filter_equal  文件级精确匹配
+#' @param file_filter_like   文件级近似匹配
+#' @param question_filter_equal 问题精确匹配
+#' @param question_filter_like  问题近似匹配
+#' @param answer_filter_equal  答案精确匹配
+#' @param answer_filter_like  答案近似匹配
+#' @param row_sep 分隔符
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' data <-dealLog2(file='data-raw/input/2019-07-26.txt',
+#' file_filter_equal,
+#' file_filter_like,
+#' question_filter_equal,
+#' question_filter_like,
+#' answer_filter_equal,
+#' answer_filter_like,
+#' row_sep );
+dealLog2 <- function(file='data-raw/input/2019-07-26.txt',
+                     file_filter_equal=c('好'),
+                     file_filter_like=c('http://'),
+                     question_filter_equal=c('在吗'),
+                     question_filter_like=c("在的"),
+                     answer_filter_equal=c('不客气'),
+                     answer_filter_like=c('不用谢'),
+                     row_sep = "") {
+  res <-read_kflog2(file = file);
+
+
+  res <-log_delFixAll(res);
+
+
+  #文件级的精确匹配;
+
+  res <- log_delRow_equals(res,file_filter_equal);
+  #View(res);
+
+  #文件级的模糊匹配
+  res <- log_delRow_contains(res,file_filter_like);
+  # View(res);
+  #形成qa列表
+  res <- log_qaList(res,sep=row_sep);
+  #View(res);
+
+  #匹配问题
+  res <- question_delRow_equal(res,question_filter_equal);
+  #View(res);
+
+  #针对问题进行模糊匹配
+  res <- question_delRow_contains(res,question_filter_like );
+  #View(res);
+  #按答案进行精确匹配
+
+  res <- answer_delRow_equal(res,answer_filter_equal);
+  #View(res);
+
+  #按答案进行模糊匹配
+
+  res <- answer_delRow_contains(res,answer_filter_like);
+
+  return(res);
+
+
+}
+
