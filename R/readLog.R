@@ -217,6 +217,10 @@ log_qaList <- function(data,sep=""){
   res$isA <- str_contain(res$aut_id,'捷豹路虎')
   res$dlg_date <- left(res$dlg_datetime,10);
   res$dlg_hms <-right(res$dlg_datetime,8);
+  #增加对数据完整性的判断
+  del_row <-del_aq(res$isA,len=10)+1;
+  all_row <-nrow(res);
+  res <- res[del_row:all_row, ];
   #判断会话的分组
   res$gp_id <-res$aut_id;
   res$gp_id[res$isA ==TRUE] <- "";
@@ -250,4 +254,95 @@ log_qaList <- function(data,sep=""){
   return(res);
 
 }
+
+
+
+#' 形成问题列表
+#'
+#' @param data 数据
+#' @param sep  分隔符
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' log_qaList2();
+log_qaList2 <- function(data,sep=""){
+  res$isA <- str_contain(res$aut_id,'捷豹路虎')
+  res$dlg_date <- left(res$dlg_datetime,10);
+  res$dlg_hms <-right(res$dlg_datetime,8);
+  #判断会话的分组
+  res$gp_id <-res$aut_id;
+  res$gp_id[res$isA ==TRUE] <- "";
+  res$gp_id <- str_copyPrevRow(res$gp_id);
+  res$session_id <- getSessionId(res$isA);
+  #按列筛选数据
+  res <- res %>% df_selectCol(c('dlg_date','gp_id','session_id','isA','logContent'))
+  res$action_id <- res$session_id *2;
+  res$action_id[res$isA == FALSE] <- res$action_id[res$isA == FALSE] -1;
+
+  # 数据进行分组处理
+  g <-res$action_id;
+  res <- split(res,g);
+  # 针对多行数据进行合并；
+  res <- lapply(res, log_combine_gp,sep=sep);
+
+  #将结合调整回一个数据框；
+  res <- do.call("rbind",res);
+
+  #将数据进一步进行处理
+  #删除actionId
+  res <- res[,c( "dlg_date","gp_id","session_id","isA","logContent")]
+  res_q <- res[res$isA == FALSE,];
+  res_q$question <- res_q$logContent;
+  res_a <- res[res$isA == TRUE,];
+  res_a$answer <- res_a$logContent;
+  res <- df_innerJoin_bySameColNames(res_q,res_a,"session_id");
+  res_name_sel <-c("dlg_date.x","gp_id.x","session_id","question","answer")
+  res<-res[,res_name_sel];
+  names(res) <-c("dlg_date","gp_id","session_id","question","answer")
+  return(res);
+
+}
+
+
+
+#' 针对aq情况进行处理
+#'
+#' @param x 原始数据
+#' @param len 取数长度
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' del_aq();
+del_aq <- function(x,len=10){
+  res <- 0
+  if (len > length(x)){
+    len <- length(x);
+  }
+  if (x[1] == FALSE){
+    res <-0
+
+  }else{
+    x <-x[1:len];
+    for (i in 1:len){
+      if (x[i] == TRUE){
+        res <- res + 1;
+      }else{
+        res <- res+ 0
+        x[i:len] <- FALSE;
+      }
+
+
+  }
+
+
+
+  }
+  return(res);
+}
+
+
 

@@ -15,7 +15,7 @@ names(data_tpl) <- col_nickName;
 
 
 
-res <-read_kflog2(file = "data-raw/input/2019-07-26.txt");
+res <-read_kflog2(file = "./data-raw/input/201908B//2019-08-08 .txt");
 #View(res);
 
 res <-log_delFixAll(res);
@@ -30,8 +30,11 @@ res <- log_delRow_equals(res,file_filter_equal);
 res <- log_delRow_contains(res,file_filter_like);
 # View(res);
 #形成qa列表
+
+View(res);
+
 res <- log_qaList(res,sep=row_sep);
-#View(res);
+
 
 #匹配问题
 res <- question_delRow_equal(res,question_filter_equal);
@@ -65,7 +68,7 @@ res_formatted <- data.frame(A,B,C,D,E,F,G,H,I,stringsAsFactors = FALSE);
 
 res_output <- rbind(data_tpl,res_formatted);
 #View(res_output);
-openxlsx::write.xlsx(res_output,"res_output26.xlsx");
+openxlsx::write.xlsx(res_output,"res_output20190808.xlsx");
 
 
 

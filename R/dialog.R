@@ -8,11 +8,14 @@
 #' @examples
 #' getSessionId(F,F,T,T,F,T,T)
 getSessionId <- function(x){
-  ncount <- length(x);
+  # ncount <- length(x);
+  # del_n<-del_aq(x)+1;
+  # x <- x[del_n:ncount];
 
   if (x[1] == TRUE){
     stop("数据应该从FALSE开始",call. = F);
   }
+  ncount <- length(x);
   #定义一个结果变量
   res <- numeric(ncount);
   res[1] <- 1;
