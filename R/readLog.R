@@ -50,6 +50,23 @@ read_kflog2 <- function(file='data-raw/input/2019-07-17.txt') {
 
 }
 
+#' 批量处理客服日志文件
+#'
+#' @param files 多个文件名
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' read_kflogs()
+read_kflogs <- function(files){
+  res<- lapply(files,read_kflog2);
+  res <- do.call('rbind',res);
+  return(res);
+}
+
+
+
 #' 在原始log文件中删除会话符号----
 #'
 #' @param x 原始数据向量
