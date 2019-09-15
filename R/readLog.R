@@ -67,18 +67,17 @@ read_kflog2 <- function(file='data-raw/input/2019-07-17.txt') {
 #' 批量处理客服日志文件
 #'
 #' @param files 多个文件名
-#' @param brand 输入品牌信息
 #'
 #' @return 返回值
 #' @export
 #'
 #' @examples
 #' read_kflogs()
-read_kflogs <- function(files,brand=NULL){
+read_kflogs <- function(files){
   res<- lapply(files,read_kflog2);
   res <- do.call('rbind',res);
-  ncount <- nrow(res);
-  res$FBrand <- rep(brand,ncount);
+  #ncount <- nrow(res);
+  #res$FBrand <- rep(brand,ncount);
   return(res);
 }
 
