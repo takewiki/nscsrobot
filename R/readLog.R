@@ -45,8 +45,10 @@ read_kflog2 <- function(file='data-raw/input/2019-07-17.txt') {
   aut_datetime <- str_splitByLeftBrace(authorTime);
   aut_id <- aut_datetime[[1]];
   dlg_datetime <- aut_datetime[[2]];
+  dlg_date <- left(dlg_datetime,10);
+  dlg_hms <-right(dlg_datetime,8);
 
-  res <- data.frame(aut_id,dlg_datetime,logContent,stringsAsFactors = F);
+  res <- data.frame(aut_id,dlg_date,dlg_hms,logContent,stringsAsFactors = F);
 
 }
 
