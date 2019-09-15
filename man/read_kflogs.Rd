@@ -4,10 +4,12 @@
 \alias{read_kflogs}
 \title{批量处理客服日志文件}
 \usage{
-read_kflogs(files)
+read_kflogs(files, brand = NULL)
 }
 \arguments{
 \item{files}{多个文件名}
+
+\item{brand}{输入品牌信息}
 }
 \value{
 返回值
