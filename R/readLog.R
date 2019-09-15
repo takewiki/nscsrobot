@@ -45,10 +45,22 @@ read_kflog2 <- function(file='data-raw/input/2019-07-17.txt') {
   aut_datetime <- str_splitByLeftBrace(authorTime);
   aut_id <- aut_datetime[[1]];
   dlg_datetime <- aut_datetime[[2]];
-  dlg_date <- left(dlg_datetime,10);
-  dlg_hms <-right(dlg_datetime,8);
+  #class(dlg_datetime);
+  res <- data.frame(aut_id,dlg_datetime,logContent,stringsAsFactors = F);
+  res$logContent[is.na(res$dlg_datetime)] <- res$aut_id[is.na(res$dlg_datetime)];
+  res$aut_id[is.na(res$dlg_datetime)] <- "";
+  ncount <- nrow(res);
+  for(i in 1:ncount){
+    if(is.na(res$dlg_datetime[i])){
+      res[i,'dlg_datetime'] <-res$dlg_datetime[i-1]
+      res[i,'aut_id'] <- res$aut_id[i-1]
+    }
+  }
+  res$dlg_date <- left(res$dlg_datetime,10);
+  res$dlg_hms <-right(res$dlg_datetime,8);
+  return(res);
 
-  res <- data.frame(aut_id,dlg_date,dlg_hms,logContent,stringsAsFactors = F);
+
 
 }
 
