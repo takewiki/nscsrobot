@@ -21,6 +21,26 @@ read_kflog <- function(file='data-raw/input/2019-07-17.txt') {
 
 
 }
+
+#' 读取新的日志信息
+#'
+#' @param file 日志文件
+#'
+#' @return 返回数据框
+#' @import readr
+#' @export
+#'
+#' @examples
+#' read_kflog_new()
+read_kflog_new <- function(file='data-raw/2020-05-03～2020-05-03-final.txt') {
+  res <- read_delim(file,
+                    "\t", escape_double = FALSE)
+  res <- tbl_as_df(res);
+  #重命名为FkfLog
+  names(res) <-'FkfLog'
+  return(res);
+}
+
 #' 读取日志文件
 #'
 #' @param file 文件名
@@ -64,6 +84,69 @@ read_kflog2 <- function(file='data-raw/input/2019-07-17.txt') {
 
 }
 
+
+#' 读取日志并进行格式化处理
+#'
+#' @param file 文件名
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' read_log2_new()
+read_kflog2_new <- function(file='data-raw/2020-05-03～2020-05-03-final.txt') {
+  bbd <-read_kflog_new(file);
+
+  # read_kflog_new() -> bbd
+  # View(bbd)
+
+  txt <- bbd$FkfLog;
+  #head(txt)
+
+  #删除----
+
+
+  txt <- tsdo::str_delRows(txt,"单聊")
+  txt <- tsdo::str_delRows(txt,"群聊")
+  txt <- tsdo::str_delRows(txt,"======")
+  txt <- tsdo::str_delRows(txt,"------")
+  has_datetime <- tsdo::str_HasDateTime(txt)
+  #has_datetime
+  mydata <- data.frame(FLog =txt,FLag=has_datetime,stringsAsFactors = F)
+
+  mydata2 <- tsdo::df_combineRows(data = mydata,var_txt = 'FLog',var_flag = 'FLag')
+
+
+  mydata2$log_datetime <- tsdo::str_extractDateTime(mydata2$FLog)
+
+  mydata2$log_date <- tsdo::str_extractDate(mydata2$FLog)
+
+  mydata2$log_time <- tsdo::str_extractTime(mydata2$FLog)
+
+  #提取相关信息
+
+
+  #View(mydata2)
+
+
+
+
+
+
+  mydata3 <- tsdo::df_splitByCol(data = mydata2,var_txt='FLog',var_split='log_datetime',var_left='author',left_skip=2,var_right='content',right_skip=4)
+
+
+  #View(mydata3)
+
+  mydata4 <- tsdo::df_setLabel(data = mydata3,var_txt = 'FLog',keyword = '捷豹路虎官方旗舰店',var_flag = 'FIsA')
+
+
+  return(mydata4)
+
+
+}
+
+
 #' 批量处理客服日志文件
 #'
 #' @param files 多个文件名
@@ -75,6 +158,25 @@ read_kflog2 <- function(file='data-raw/input/2019-07-17.txt') {
 #' read_kflogs()
 read_kflogs <- function(files){
   res<- lapply(files,read_kflog2);
+  res <- do.call('rbind',res);
+  #ncount <- nrow(res);
+  #res$FBrand <- rep(brand,ncount);
+  return(res);
+}
+
+
+
+#' 批量处理客服日志文件
+#'
+#' @param files 多个文件名
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' read_kflogs_new()
+read_kflogs_new <- function(files){
+  res<- lapply(files,read_kflog2_new);
   res <- do.call('rbind',res);
   #ncount <- nrow(res);
   #res$FBrand <- rep(brand,ncount);
